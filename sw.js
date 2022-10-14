@@ -4,34 +4,22 @@ const CACHE_NAME = 'v1_cache_awp';
 //configurar los archivos del cache
 
 var urlToCache = [
-    './',
-    './css/style.css',
-    './images/1.png',
-    './images/2.png',
-    './images/3.png',
-    './images/4.png',
-    './images/5.png',
-    './images/6.png',
-    './images/facebook.png',
-    './images/favicon-16.png',
-    './images/favicon-32.png',
-    './images/favicon-64.png',
-    './images/favicon-96.png',
-    './images/favicon-128.png',
-    './images/favicon-144.png',
-    './images/favicon-192.png',
-    './images/favicon-256.png',
-    './images/favicon-384.png',
-    './images/favicon-512.png',
-    './images/favicon-1024.png',
-    './images/favicon.png',
-    './images/instagram.png',
-    './images/twiter.png',
+    'css/style.css',
+    'images/1.png',
+    'images/2.png',
+    'images/3.png',
+    'images/4.png',
+    'images/5.png',
+    'images/6.png',
+    'images/7.png',
+    'images/facebook.png',
+    'images/instagram.png',
+    'images/twiter.png',
 ];
 
 // Evento install
 // Instalacion del service worker y guardar en cache los recursos estaticos
-self.addEventListener('insntall', e =>{
+self.addEventListener('install', e =>{
     e.waitUntil(
         caches.open(CACHE_NAME)
               .then(cache => {
@@ -68,17 +56,16 @@ self.addEventListener('activate', e =>{
     );
 });
 
-//Evento fetch
-
-self.addEventListener('fetch', e => {
-    e.respondWith(
-        caches.match(e.request)
-            .then(res => {
-                if(res){
-                    //devuelvo los datos desde cache
-                    return res;
-                }
-                return fetch(e.request);
-            })
-    );
-})
+///Evento fetch
+self.addEventListener("fetch", event => {
+	event.respondWith(
+		caches.open(CACHE_NAME).then(cache => {
+			return cache.match(event.request).then(response => {
+				return response || fetch(event.request).then(networkResponse => {
+					cache.put(event.request, networkResponse.clone());
+					return networkResponse;
+				});
+			})
+		})
+	);
+});
